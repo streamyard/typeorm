@@ -1445,10 +1445,10 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
     }
 
     /**
-     * Sets LIMIT - maximum number of rows to be selected.
+     * Set's LIMIT - maximum number of rows to be selected.
      * NOTE that it may not work as you expect if you are using joins.
      * If you want to implement pagination, and you are having join in your query,
-     * then use the take method instead.
+     * then use instead take method instead.
      */
     limit(limit?: number): this {
         this.expressionMap.limit = this.normalizeNumber(limit)
@@ -1464,10 +1464,10 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
     }
 
     /**
-     * Sets OFFSET - selection offset.
+     * Set's OFFSET - selection offset.
      * NOTE that it may not work as you expect if you are using joins.
      * If you want to implement pagination, and you are having join in your query,
-     * then use the skip method instead.
+     * then use instead skip method instead.
      */
     offset(offset?: number): this {
         this.expressionMap.offset = this.normalizeNumber(offset)
@@ -2348,11 +2348,6 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                     })
                     .join(" AND ")
 
-                if (!condition)
-                    throw new TypeORMError(
-                        `Relation ${relation.entityMetadata.name}.${relation.propertyName} does not have join columns.`,
-                    )
-
                 return (
                     " " +
                     joinAttr.direction +
@@ -2882,11 +2877,6 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                     })
                 })
             } else {
-                if (column.isVirtualProperty) {
-                    // Do not add unselected virtual properties to final select
-                    return
-                }
-
                 finalSelects.push({
                     selection: selectionPath,
                     aliasName: DriverUtils.buildAlias(
@@ -3603,7 +3593,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                           )
                         : this.findOptions.relations
 
-                    const queryBuilder = this.createQueryBuilder(queryRunner)
+                    const queryBuilder = this.createQueryBuilder()
                         .select(relationAlias)
                         .from(relationTarget, relationAlias)
                         .setFindOptions({
@@ -3753,12 +3743,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
      */
     protected async loadRawResults(queryRunner: QueryRunner) {
         const [sql, parameters] = this.getQueryAndParameters()
-        const queryId =
-            sql +
-            " -- PARAMETERS: " +
-            JSON.stringify(parameters, (_, value) =>
-                typeof value === "bigint" ? value.toString() : value,
-            )
+        const queryId = sql + " -- PARAMETERS: " + JSON.stringify(parameters)
         const cacheOptions =
             typeof this.connection.options.cache === "object"
                 ? this.connection.options.cache
@@ -3767,10 +3752,9 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
             undefined
         const isCachingEnabled =
             // Caching is enabled globally and isn't disabled locally.
-            (cacheOptions.alwaysEnabled &&
-                this.expressionMap.cache !== false) ||
+            (cacheOptions.alwaysEnabled && this.expressionMap.cache) ||
             // ...or it's enabled locally explicitly.
-            this.expressionMap.cache === true
+            this.expressionMap.cache
         let cacheError = false
         if (this.connection.queryResultCache && isCachingEnabled) {
             try {
@@ -3858,12 +3842,7 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
      * Creates a query builder used to execute sql queries inside this query builder.
      */
     protected obtainQueryRunner() {
-        return (
-            this.queryRunner ||
-            this.connection.createQueryRunner(
-                this.connection.defaultReplicationModeForReads(),
-            )
-        )
+        return this.queryRunner || this.connection.createQueryRunner("slave")
     }
 
     protected buildSelect(
@@ -4224,9 +4203,10 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
     ) {
         let condition: string = ""
         // let parameterIndex = Object.keys(this.expressionMap.nativeParameters).length;
-        if (Array.isArray(where)) {
-            if (where.length) {
-                condition = where
+        if (Array.isArray(where) && where.length) {
+            condition =
+                "(" +
+                where
                     .map((whereItem) => {
                         return this.buildWhere(
                             whereItem,
@@ -4237,8 +4217,8 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                     })
                     .filter((condition) => !!condition)
                     .map((condition) => "(" + condition + ")")
-                    .join(" OR ")
-            }
+                    .join(" OR ") +
+                ")"
         } else {
             let andConditions: string[] = []
             for (let key in where) {
@@ -4507,10 +4487,8 @@ export class SelectQueryBuilder<Entity extends ObjectLiteral>
                     }
                 }
             }
-            condition = andConditions.length
-                ? "(" + andConditions.join(") AND (") + ")"
-                : andConditions.join(" AND ")
+            condition = andConditions.join(" AND ")
         }
-        return condition.length ? "(" + condition + ")" : condition
+        return condition
     }
 }

@@ -29,8 +29,6 @@
 -   [Using subqueries](#using-subqueries)
 -   [Hidden Columns](#hidden-columns)
 -   [Querying Deleted rows](#querying-deleted-rows)
--   [Common table expressions](#common-table-expressions)
--   [Time Travel Queries](#time-travel-queries)
 -   [Debugging](#debugging)
 
 ## What is `QueryBuilder`
@@ -76,7 +74,6 @@ When using the `QueryBuilder`, you need to provide unique parameters in your `WH
 
 ```TypeScript
 const result = await dataSource
-    .getRepository(User)
     .createQueryBuilder('user')
     .leftJoinAndSelect('user.linkedSheep', 'linkedSheep')
     .leftJoinAndSelect('user.linkedCow', 'linkedCow')
@@ -88,7 +85,6 @@ const result = await dataSource
 
 ```TypeScript
 const result = await dataSource
-    .getRepository(User)
     .createQueryBuilder('user')
     .leftJoinAndSelect('user.linkedSheep', 'linkedSheep')
     .leftJoinAndSelect('user.linkedCow', 'linkedCow')
@@ -316,7 +312,7 @@ One query builder is not limited to one alias, they can have multiple aliases.
 Each select can have its own alias,
 you can select from multiple tables each with its own alias,
 you can join multiple tables each with its own alias.
-You can use those aliases to access tables you are selecting (or data you are selecting).
+You can use those aliases to access tables are you selecting (or data you are selecting).
 
 ## Using parameters to escape data
 
@@ -1201,7 +1197,7 @@ If the model you are querying has a column with the attribute `@DeleteDateColumn
 Let's say you have the following entity:
 
 ```typescript
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 
 @Entity()
 export class User {

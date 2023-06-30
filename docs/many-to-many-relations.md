@@ -259,20 +259,20 @@ const categoriesWithQuestions = await dataSource
 ## Many-to-many relations with custom properties
 
 In case you need to have additional properties in your many-to-many relationship, you have to create a new entity yourself.
-For example, if you would like entities `Question` and `Category` to have a many-to-many relationship with an additional `order` column, then you need to create an entity `QuestionToCategory` with two `ManyToOne` relations pointing in both directions and with custom columns in it:
+For example, if you would like entities `Post` and `Category` to have a many-to-many relationship with an additional `order` column, then you need to create an entity `PostToCategory` with two `ManyToOne` relations pointing in both directions and with custom columns in it:
 
 ```typescript
 import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Question } from "./question"
+import { Post } from "./post"
 import { Category } from "./category"
 
 @Entity()
-export class QuestionToCategory {
+export class PostToCategory {
     @PrimaryGeneratedColumn()
-    public questionToCategoryId: number
+    public postToCategoryId: number
 
     @Column()
-    public questionId: number
+    public postId: number
 
     @Column()
     public categoryId: number
@@ -280,24 +280,24 @@ export class QuestionToCategory {
     @Column()
     public order: number
 
-    @ManyToOne(() => Question, (question) => question.questionToCategories)
-    public question: Question
+    @ManyToOne(() => Post, (post) => post.postToCategories)
+    public post: Post
 
-    @ManyToOne(() => Category, (category) => category.questionToCategories)
+    @ManyToOne(() => Category, (category) => category.postToCategories)
     public category: Category
 }
 ```
 
-Additionally you will have to add a relationship like the following to `Question` and `Category`:
+Additionally you will have to add a relationship like the following to `Post` and `Category`:
 
 ```typescript
 // category.ts
 ...
-@OneToMany(() => questionToCategory, questionToCategory => questionToCategory.category)
-public questionToCategories: QuestionToCategory[];
+@OneToMany(() => PostToCategory, postToCategory => postToCategory.category)
+public postToCategories: PostToCategory[];
 
-// question.ts
+// post.ts
 ...
-@OneToMany(() => QuestionToCategory, questionToCategory => questionToCategory.question)
-public questionToCategories: QuestionToCategory[];
+@OneToMany(() => PostToCategory, postToCategory => postToCategory.post)
+public postToCategories: PostToCategory[];
 ```

@@ -43,7 +43,6 @@ import {
     UpdateFilter,
     UpdateOptions,
     UpdateResult,
-    CountDocumentsOptions,
 } from "../driver/mongodb/typings"
 import { FindManyOptions } from "../find-options/FindManyOptions"
 
@@ -248,20 +247,6 @@ export class MongoRepository<
     /**
      * Count number of matching documents in the db to a query.
      */
-    countDocuments(
-        query?: ObjectLiteral,
-        options?: CountDocumentsOptions,
-    ): Promise<number> {
-        return this.manager.countDocuments(
-            this.metadata.target,
-            query || {},
-            options,
-        )
-    }
-
-    /**
-     * Count number of matching documents in the db to a query.
-     */
     countBy(query?: ObjectLiteral, options?: CountOptions): Promise<number> {
         return this.manager.countBy(this.metadata.target, query, options)
     }
@@ -355,7 +340,7 @@ export class MongoRepository<
     findOneAndDelete(
         query: ObjectLiteral,
         options?: FindOneAndDeleteOptions,
-    ): Promise<Document | null> {
+    ): Promise<Document> {
         return this.manager.findOneAndDelete(
             this.metadata.tableName,
             query,
@@ -370,7 +355,7 @@ export class MongoRepository<
         query: ObjectLiteral,
         replacement: Object,
         options?: FindOneAndReplaceOptions,
-    ): Promise<Document | null> {
+    ): Promise<Document> {
         return this.manager.findOneAndReplace(
             this.metadata.tableName,
             query,
@@ -386,7 +371,7 @@ export class MongoRepository<
         query: ObjectLiteral,
         update: Object,
         options?: FindOneAndUpdateOptions,
-    ): Promise<Document | null> {
+    ): Promise<Document> {
         return this.manager.findOneAndUpdate(
             this.metadata.tableName,
             query,

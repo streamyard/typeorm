@@ -3,7 +3,7 @@ import { Foo } from "./Foo"
 
 @ViewEntity({
     name: "foo_view",
-    schema: "TYPEORM",
+    schema: "SYSTEM",
     expression: (connection: DataSource) =>
         connection.createQueryBuilder(Foo, "foo").select(`foo.updatedAt`),
 })

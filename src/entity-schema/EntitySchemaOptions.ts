@@ -124,9 +124,4 @@ export class EntitySchemaOptions<T> {
      * Inheritance options.
      */
     inheritance?: EntitySchemaInheritanceOptions
-
-    /**
-     * Custom discriminator value for Single Table Inheritance.
-     */
-    discriminatorValue?: string
 }

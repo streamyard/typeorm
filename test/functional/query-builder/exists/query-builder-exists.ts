@@ -7,7 +7,7 @@ import { DataSource } from "../../../../src/data-source/DataSource"
 import { expect } from "chai"
 import { Test } from "./entity/Test"
 
-describe("query builder > exists", () => {
+describe("query builder > exist", () => {
     let connections: DataSource[]
     before(
         async () =>
@@ -25,8 +25,8 @@ describe("query builder > exists", () => {
             connections.map(async (connection) => {
                 const repo = connection.getRepository(Test)
 
-                const exists = await repo.exists()
-                expect(exists).to.be.equal(false)
+                const exist = await repo.exist()
+                expect(exist).to.be.equal(false)
             }),
         ))
 
@@ -38,8 +38,8 @@ describe("query builder > exists", () => {
                 await repo.save({ id: "ok" })
                 await repo.save({ id: "nok" })
 
-                const exists = await repo.exists()
-                expect(exists).to.be.equal(true)
+                const exist = await repo.exist()
+                expect(exist).to.be.equal(true)
             }),
         ))
 })

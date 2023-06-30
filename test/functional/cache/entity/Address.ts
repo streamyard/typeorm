@@ -14,6 +14,6 @@ export class Address {
     @Column()
     address: string
 
-    @ManyToOne(() => User, (u) => u.addresses)
+    @ManyToOne(() => User)
     user: User
 }

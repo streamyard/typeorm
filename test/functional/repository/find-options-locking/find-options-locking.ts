@@ -11,7 +11,6 @@ import {
     OptimisticLockCanNotBeUsedError,
     OptimisticLockVersionMismatchError,
     PessimisticLockTransactionRequiredError,
-    QueryRunner,
 } from "../../../../src"
 import { PostWithVersion } from "./entity/PostWithVersion"
 import { expect } from "chai"
@@ -136,9 +135,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -178,9 +175,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -209,9 +204,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -250,9 +243,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -294,9 +285,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -333,9 +322,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -373,9 +360,7 @@ describe("repository > find options > locking", () => {
                     const originalQuery = entityManager.queryRunner!.query.bind(
                         entityManager.queryRunner,
                     )
-                    entityManager.queryRunner!.query = (
-                        ...args: Parameters<QueryRunner["query"]>
-                    ) => {
+                    entityManager.queryRunner!.query = (...args: any[]) => {
                         executedSql.push(args[0])
                         return originalQuery(...args)
                     }
@@ -638,17 +623,11 @@ describe("repository > find options > locking", () => {
                                     tables: ["post"],
                                 },
                             }),
-                            entityManager
-                                .getRepository(Post)
-                                .findOne({
-                                    where: { id: 1 },
-                                    relations: { author: true },
-                                    lock: { mode: "pessimistic_write" },
-                                })
-                                .should.be.rejectedWith(
-                                    "FOR UPDATE cannot be applied to the nullable side of an outer join",
-                                ),
-                            ,
+                            entityManager.getRepository(Post).findOne({
+                                where: { id: 1 },
+                                relations: { author: true },
+                                lock: { mode: "pessimistic_write" },
+                            }),
                         ])
                     })
                 }

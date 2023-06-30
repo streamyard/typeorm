@@ -459,8 +459,7 @@ export class InsertQueryBuilder<
         // add VALUES expression
         if (valuesExpression) {
             if (
-                (this.connection.driver.options.type === "oracle" ||
-                    this.connection.driver.options.type === "sap") &&
+                this.connection.driver.options.type === "oracle" &&
                 this.getValueSets().length > 1
             ) {
                 query += ` ${valuesExpression}`
@@ -517,7 +516,9 @@ export class InsertQueryBuilder<
                             indexPredicate &&
                             DriverUtils.isPostgresFamily(this.connection.driver)
                         ) {
-                            conflictTarget += ` WHERE ( ${indexPredicate} )`
+                            conflictTarget += ` WHERE ( ${this.escape(
+                                indexPredicate,
+                            )} )`
                         }
                     } else if (conflict) {
                         conflictTarget += ` ON CONSTRAINT ${this.escape(
@@ -525,60 +526,25 @@ export class InsertQueryBuilder<
                         )}`
                     }
 
-                    const updatePart: string[] = []
-
                     if (Array.isArray(overwrite)) {
-                        updatePart.push(
-                            ...overwrite.map(
+                        query += ` ${conflictTarget} DO UPDATE SET `
+                        query += overwrite
+                            ?.map(
                                 (column) =>
                                     `${this.escape(
                                         column,
                                     )} = EXCLUDED.${this.escape(column)}`,
-                            ),
-                        )
+                            )
+                            .join(", ")
+                        query += " "
                     } else if (columns) {
-                        updatePart.push(
-                            ...columns.map(
+                        query += ` ${conflictTarget} DO UPDATE SET `
+                        query += columns
+                            .map(
                                 (column) =>
                                     `${this.escape(column)} = :${column}`,
-                            ),
-                        )
-                    }
-
-                    if (updatePart.length > 0) {
-                        query += ` ${conflictTarget} DO UPDATE SET `
-
-                        updatePart.push(
-                            ...this.expressionMap
-                                .mainAlias!.metadata.columns.filter(
-                                    (column) =>
-                                        column.isUpdateDate &&
-                                        !overwrite?.includes(
-                                            column.databaseName,
-                                        ) &&
-                                        !(
-                                            (this.connection.driver.options
-                                                .type === "oracle" &&
-                                                this.getValueSets().length >
-                                                    1) ||
-                                            DriverUtils.isSQLiteFamily(
-                                                this.connection.driver,
-                                            ) ||
-                                            this.connection.driver.options
-                                                .type === "sap" ||
-                                            this.connection.driver.options
-                                                .type === "spanner"
-                                        ),
-                                )
-                                .map(
-                                    (column) =>
-                                        `${this.escape(
-                                            column.databaseName,
-                                        )} = DEFAULT`,
-                                ),
-                        )
-
-                        query += updatePart.join(", ")
+                            )
+                            .join(", ")
                         query += " "
                     }
 

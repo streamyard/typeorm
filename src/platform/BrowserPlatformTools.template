@@ -5,8 +5,6 @@
  * For node.js environment this class is not getting packaged.
  * Don't use methods of this class in the code, use PlatformTools methods instead.
  */
-import { Buffer } from "buffer";
-
 export class PlatformTools {
 
     /**
@@ -166,8 +164,8 @@ interface Window {
 }
 
 declare var window: Window;
-if (typeof window !== "undefined") {
-    window.Buffer = Buffer;
+if (typeof window !== "undefined" && typeof require !== "undefined") {
+    window.Buffer = require("buffer/").Buffer;
 }
 // NativeScript uses global, not window
 if (typeof global !== "undefined" && typeof require !== "undefined") {

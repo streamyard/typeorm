@@ -120,7 +120,7 @@ Or you can extend the `AbstractLogger` class:
 ```typescript
 import { AbstractLogger } from "typeorm"
 
-export class MyCustomLogger extends AbstractLogger {
+export class MyCustomLogger implements AbstractLogger {
     /**
      * Write log to specific output.
      */
