@@ -160,15 +160,15 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             await this.connect()
             let rawResult:
                 | [
-                    any[],
-                    {
-                        queryPlan: null
-                        queryStats: null
-                        rowCountExact: string
-                        rowCount: string
-                    },
-                    { rowType: { fields: [] }; transaction: null },
-                ]
+                      any[],
+                      {
+                          queryPlan: null
+                          queryStats: null
+                          rowCountExact: string
+                          rowCount: string
+                      },
+                      { rowType: { fields: [] }; transaction: null },
+                  ]
                 | undefined = undefined
             const isSelect = query.startsWith("SELECT")
             const executor =
@@ -186,9 +186,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                     sql: query,
                     params: parameters
                         ? parameters.reduce((params, value, index) => {
-                            params["param" + index] = value
-                            return params
-                        }, {} as ObjectLiteral)
+                              params["param" + index] = value
+                              return params
+                          }, {} as ObjectLiteral)
                         : undefined,
                     json: true,
                 })
@@ -200,7 +200,7 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                     // we throw original error even if rollback thrown an error
                     if (!this.isTransactionActive && !isSelect)
                         await this.sessionTransaction.rollback()
-                } catch (rollbackError) { }
+                } catch (rollbackError) {}
                 throw error
             }
 
@@ -304,9 +304,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                 sql: query,
                 params: parameters
                     ? parameters.reduce((params, value, index) => {
-                        params["param" + index] = value
-                        return params
-                    }, {} as ObjectLiteral)
+                          params["param" + index] = value
+                          return params
+                      }, {} as ObjectLiteral)
                     : undefined,
                 json: true,
             }
@@ -785,8 +785,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             oldTableColumnOrName instanceof TableColumn
                 ? oldTableColumnOrName
                 : table.columns.find(
-                    (column) => column.name === oldTableColumnOrName,
-                )
+                      (column) => column.name === oldTableColumnOrName,
+                  )
         if (!oldColumn)
             throw new TypeORMError(
                 `Column "${oldTableColumnOrName}" was not found in the "${table.name}" table.`,
@@ -813,13 +813,15 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             ) {
                 upQueries.push(
                     new Query(
-                        `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${newColumn.name
+                        `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${
+                            newColumn.name
                         }" TYPE ${this.driver.createFullType(newColumn)}`,
                     ),
                 )
                 downQueries.push(
                     new Query(
-                        `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${newColumn.name
+                        `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${
+                            newColumn.name
                         }" TYPE ${this.driver.createFullType(oldColumn)}`,
                     ),
                 )
@@ -1469,7 +1471,7 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                 // we throw original error even if rollback thrown an error
                 if (!isAnotherTransactionActive)
                     await this.rollbackTransaction()
-            } catch (rollbackError) { }
+            } catch (rollbackError) {}
             throw error
         }
     }
@@ -1654,9 +1656,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                                 (dbIndex) => {
                                     return (
                                         dbIndex["TABLE_NAME"] ===
-                                        dbTable["TABLE_NAME"] &&
+                                            dbTable["TABLE_NAME"] &&
                                         dbIndex["COLUMN_NAME"] ===
-                                        dbColumn["COLUMN_NAME"] &&
+                                            dbColumn["COLUMN_NAME"] &&
                                         dbIndex["IS_UNIQUE"] === true
                                     )
                                 },
@@ -1676,7 +1678,7 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                                         (uniqueIndex) => {
                                             return (
                                                 index.name ===
-                                                uniqueIndex["INDEX_NAME"] &&
+                                                    uniqueIndex["INDEX_NAME"] &&
                                                 index.synchronize === false
                                             )
                                         },
@@ -1688,9 +1690,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                                     return dbIndices.some(
                                         (dbIndex) =>
                                             dbIndex["INDEX_NAME"] ===
-                                            uniqueIndex["INDEX_NAME"] &&
+                                                uniqueIndex["INDEX_NAME"] &&
                                             dbIndex["COLUMN_NAME"] !==
-                                            dbColumn["COLUMN_NAME"],
+                                                dbColumn["COLUMN_NAME"],
                                     )
                                 })
 
@@ -1762,9 +1764,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                                 (dbPrimaryKey) => {
                                     return (
                                         dbPrimaryKey["TABLE_NAME"] ===
-                                        dbColumn["TABLE_NAME"] &&
+                                            dbColumn["TABLE_NAME"] &&
                                         dbPrimaryKey["COLUMN_NAME"] ===
-                                        dbColumn["COLUMN_NAME"]
+                                            dbColumn["COLUMN_NAME"]
                                     )
                                 },
                             )
@@ -1921,9 +1923,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                     const checkName = check.name
                         ? check.name
                         : this.connection.namingStrategy.checkConstraintName(
-                            table,
-                            check.expression!,
-                        )
+                              table,
+                              check.expression!,
+                          )
                     return `CONSTRAINT \`${checkName}\` CHECK (${check.expression})`
                 })
                 .join(", ")
@@ -1948,10 +1950,11 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                         .map((columnName) => `\`${columnName}\``)
                         .join(", ")
 
-                    return `CONSTRAINT \`${fk.name
-                        }\` FOREIGN KEY (${columnNames}) REFERENCES ${this.escapePath(
-                            this.getTablePath(fk),
-                        )} (${referencedColumnNames})`
+                    return `CONSTRAINT \`${
+                        fk.name
+                    }\` FOREIGN KEY (${columnNames}) REFERENCES ${this.escapePath(
+                        this.getTablePath(fk),
+                    )} (${referencedColumnNames})`
                 })
                 .join(", ")
 
@@ -2071,7 +2074,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
         checkConstraint: TableCheck,
     ): Query {
         return new Query(
-            `ALTER TABLE ${this.escapePath(table)} ADD CONSTRAINT \`${checkConstraint.name
+            `ALTER TABLE ${this.escapePath(table)} ADD CONSTRAINT \`${
+                checkConstraint.name
             }\` CHECK (${checkConstraint.expression})`,
         )
     }
@@ -2106,7 +2110,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             .map((column) => this.driver.escape(column))
             .join(",")
         let sql =
-            `ALTER TABLE ${this.escapePath(table)} ADD CONSTRAINT \`${foreignKey.name
+            `ALTER TABLE ${this.escapePath(table)} ADD CONSTRAINT \`${
+                foreignKey.name
             }\` FOREIGN KEY (${columnNames}) ` +
             `REFERENCES ${this.escapePath(
                 this.getTablePath(foreignKey),
