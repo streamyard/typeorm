@@ -1,13 +1,14 @@
 import { BaseConnectionOptions } from "../../connection/BaseConnectionOptions"
 import { ReplicationMode } from "../types/ReplicationMode"
 import { SpannerConnectionCredentialsOptions } from "./SpannerConnectionCredentialsOptions"
+import { SpannerSessionPoolOptions } from "./SpannerSessionPoolOptions"
 
 /**
  * Spanner specific connection options.
  */
 export interface SpannerConnectionOptions
     extends BaseConnectionOptions,
-        SpannerConnectionCredentialsOptions {
+    SpannerConnectionCredentialsOptions {
     /**
      * Database type.
      */
@@ -153,4 +154,6 @@ export interface SpannerConnectionOptions
     }
 
     readonly poolSize?: never
+
+    readonly sessionPool?: SpannerSessionPoolOptions
 }
