@@ -24,7 +24,6 @@ import { TypeORMError } from "../../error"
 import { QueryResult } from "../../query-runner/QueryResult"
 import { MetadataTableType } from "../types/MetadataTableType"
 import { SpannerDriver } from "./SpannerDriver"
-import { BroadcasterResult } from "../../subscriber/BroadcasterResult"
 
 /**
  * Runs queries on a single postgres database connection.
@@ -156,9 +155,12 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
     ): Promise<any> {
         if (this.isReleased) throw new QueryRunnerAlreadyReleasedError()
 
-        const broadcasterResult = new BroadcasterResult()
-
         try {
+            this.driver.connection.logger.log(
+                "info",
+                "typeorm:query - start",
+                this,
+            )
             const queryStartTime = +new Date()
             await this.connect()
             let rawResult:
@@ -185,12 +187,11 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
 
             try {
                 this.driver.connection.logger.logQuery(query, parameters, this)
-                this.broadcaster.broadcastBeforeQueryEvent(
-                    broadcasterResult,
-                    query,
-                    parameters,
+                this.driver.connection.logger.log(
+                    "info",
+                    "typeorm:query - before run",
+                    this,
                 )
-
                 rawResult = await executor.run({
                     sql: query,
                     params: parameters
@@ -201,7 +202,18 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                         : undefined,
                     json: true,
                 })
+
+                this.driver.connection.logger.log(
+                    "info",
+                    "typeorm:query - after run",
+                    this,
+                )
                 if (!this.isTransactionActive && !isSelect) {
+                    this.driver.connection.logger.log(
+                        "info",
+                        "typeorm:query -commit",
+                        this,
+                    )
                     await this.sessionTransaction.commit()
                 }
             } catch (error) {
@@ -218,17 +230,6 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                 this.driver.options.maxQueryExecutionTime
             const queryEndTime = +new Date()
             const queryExecutionTime = queryEndTime - queryStartTime
-
-            this.broadcaster.broadcastAfterQueryEvent(
-                broadcasterResult,
-                query,
-                parameters,
-                true,
-                queryExecutionTime,
-                rawResult,
-                undefined,
-            )
-
             if (
                 maxQueryExecutionTime &&
                 queryExecutionTime > maxQueryExecutionTime
@@ -240,6 +241,11 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                     this,
                 )
 
+            this.driver.connection.logger.log(
+                "info",
+                "typeorm:query - preparing result",
+                this,
+            )
             const result = new QueryResult()
 
             result.raw = rawResult
@@ -252,6 +258,11 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                 return result.records
             }
 
+            this.driver.connection.logger.log(
+                "info",
+                "typeorm:query - end",
+                this,
+            )
             return result
         } catch (err) {
             this.driver.connection.logger.logQueryError(
@@ -260,18 +271,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                 parameters,
                 this,
             )
-            this.broadcaster.broadcastAfterQueryEvent(
-                broadcasterResult,
-                query,
-                parameters,
-                false,
-                undefined,
-                undefined,
-                err,
-            )
             throw new QueryFailedError(query, parameters, err)
         } finally {
-            await broadcasterResult.wait()
         }
     }
 
@@ -1766,7 +1767,7 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
 
                                 // We cannot relay on information_schema.columns.generation_expression, because it is formatted different.
                                 const asExpressionQuery =
-                                    this.selectTypeormMetadataSql({
+                                    await this.selectTypeormMetadataSql({
                                         table: dbTable["TABLE_NAME"],
                                         type: MetadataTableType.GENERATED_COLUMN,
                                         name: tableColumn.name,
@@ -2225,18 +2226,6 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             query.startsWith("INSERT") ||
             query.startsWith("UPDATE") ||
             query.startsWith("DELETE")
-        )
-    }
-
-    /**
-     * Change table comment.
-     */
-    changeTableComment(
-        tableOrName: Table | string,
-        comment?: string,
-    ): Promise<void> {
-        throw new TypeORMError(
-            `spanner driver does not support change table comment.`,
         )
     }
 }
