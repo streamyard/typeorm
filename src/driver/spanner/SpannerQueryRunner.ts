@@ -39,14 +39,9 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
     driver: SpannerDriver
 
     /**
-     * Real database connection from a connection pool used to perform queries.
+     * Transaction currently executed.
      */
-    protected session?: any
-
-    /**
-     * Transaction currently executed by this session.
-     */
-    protected sessionTransaction?: any
+    protected currentTransaction?: any
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -69,14 +64,16 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
      * Returns obtained database connection.
      */
     async connect(): Promise<any> {
-        if (this.session) {
-            return Promise.resolve(this.session)
-        }
+        return Promise.resolve(this.driver.instanceDatabase)
+    }
 
-        const [session] = await this.driver.instanceDatabase.createSession({})
-        this.session = session
-        this.sessionTransaction = await session.transaction()
-        return this.session
+    protected async initTransaction() {
+        if (this.currentTransaction) return this.currentTransaction
+
+        const [transaction] =
+            await this.driver.instanceDatabase.getTransaction()
+        this.currentTransaction = transaction
+        return this.currentTransaction
     }
 
     /**
@@ -85,10 +82,10 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
      */
     async release(): Promise<void> {
         this.isReleased = true
-        if (this.session) {
-            await this.session.delete()
+        if (this.currentTransaction) {
+            await this.currentTransaction.end()
         }
-        this.session = undefined
+        this.currentTransaction = undefined
         return Promise.resolve()
     }
 
@@ -104,8 +101,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
             throw err
         }
 
-        await this.connect()
-        await this.sessionTransaction.begin()
+        await this.initTransaction()
+        await this.currentTransaction.begin()
         this.connection.logger.logQuery("START TRANSACTION")
 
         await this.broadcaster.broadcast("AfterTransactionStart")
@@ -116,12 +113,12 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
      * Error will be thrown if transaction was not started.
      */
     async commitTransaction(): Promise<void> {
-        if (!this.isTransactionActive || !this.sessionTransaction)
+        if (!this.isTransactionActive || !this.currentTransaction)
             throw new TransactionNotStartedError()
 
         await this.broadcaster.broadcast("BeforeTransactionCommit")
 
-        await this.sessionTransaction.commit()
+        await this.currentTransaction.commit()
         this.connection.logger.logQuery("COMMIT")
         this.isTransactionActive = false
 
@@ -133,12 +130,12 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
      * Error will be thrown if transaction was not started.
      */
     async rollbackTransaction(): Promise<void> {
-        if (!this.isTransactionActive || !this.sessionTransaction)
+        if (!this.isTransactionActive || !this.currentTransaction)
             throw new TransactionNotStartedError()
 
         await this.broadcaster.broadcast("BeforeTransactionRollback")
 
-        await this.sessionTransaction.rollback()
+        await this.currentTransaction.rollback()
         this.connection.logger.logQuery("ROLLBACK")
         this.isTransactionActive = false
 
@@ -157,7 +154,6 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
 
         try {
             const queryStartTime = +new Date()
-            await this.connect()
             let rawResult:
                 | [
                       any[],
@@ -171,14 +167,15 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                   ]
                 | undefined = undefined
             const isSelect = query.startsWith("SELECT")
+            if (!this.isTransactionActive && !isSelect) {
+                await this.initTransaction()
+                await this.currentTransaction.begin()
+            }
+
             const executor =
                 isSelect && !this.isTransactionActive
                     ? this.driver.instanceDatabase
-                    : this.sessionTransaction
-
-            if (!this.isTransactionActive && !isSelect) {
-                await this.sessionTransaction.begin()
-            }
+                    : this.currentTransaction
 
             try {
                 this.driver.connection.logger.logQuery(query, parameters, this)
@@ -193,13 +190,13 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                     json: true,
                 })
                 if (!this.isTransactionActive && !isSelect) {
-                    await this.sessionTransaction.commit()
+                    await this.currentTransaction.commit()
                 }
             } catch (error) {
                 try {
                     // we throw original error even if rollback thrown an error
                     if (!this.isTransactionActive && !isSelect)
-                        await this.sessionTransaction.rollback()
+                        await this.currentTransaction.rollback()
                 } catch (rollbackError) {}
                 throw error
             }
