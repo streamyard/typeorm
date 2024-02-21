@@ -167,18 +167,15 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
                   ]
                 | undefined = undefined
             const isSelect = query.startsWith("SELECT")
-            if (!isSelect && !this.isTransactionActive) {
+            if (!this.isTransactionActive && !isSelect) {
                 await this.initTransaction()
+                await this.currentTransaction.begin()
             }
 
             const executor =
                 isSelect && !this.isTransactionActive
                     ? this.driver.instanceDatabase
                     : this.currentTransaction
-
-            if (!this.isTransactionActive && !isSelect) {
-                await this.currentTransaction.begin()
-            }
 
             try {
                 this.driver.connection.logger.logQuery(query, parameters, this)
