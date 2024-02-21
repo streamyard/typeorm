@@ -68,6 +68,8 @@ export class SpannerQueryRunner extends BaseQueryRunner implements QueryRunner {
     }
 
     protected async initTransaction() {
+        if (this.currentTransaction) return this.currentTransaction
+
         const [transaction] =
             await this.driver.instanceDatabase.getTransaction()
         this.currentTransaction = transaction
