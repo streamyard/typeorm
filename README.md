@@ -161,7 +161,7 @@ const firstUser = await User.findOneBy({
 })
 const timber = await User.findOneBy({
     firstName: "Timber",
-    lastName: "Saw"
+    lastName: "Saw",
 })
 
 await timber.remove()
@@ -226,7 +226,7 @@ await timber.remove()
     - for **Google Cloud Spanner**
 
         ```
-        npm install @google-cloud/spanner --save
+        npm install @streamyard/spanner --save
         ```
 
         Provide authentication credentials to your application code

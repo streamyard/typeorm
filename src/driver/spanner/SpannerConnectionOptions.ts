@@ -8,7 +8,7 @@ import { SpannerSessionPoolOptions } from "./SpannerSessionPoolOptions"
  */
 export interface SpannerConnectionOptions
     extends BaseConnectionOptions,
-    SpannerConnectionCredentialsOptions {
+        SpannerConnectionCredentialsOptions {
     /**
      * Database type.
      */
@@ -16,7 +16,7 @@ export interface SpannerConnectionOptions
 
     /**
      * The driver object
-     * This defaults to require("@google-cloud/spanner").
+     * This defaults to require("@streamyard/spanner").
      */
     readonly driver?: any
 
