@@ -1,7 +1,7 @@
 {
   "name": "@streamyard/typeorm",
   "private": true,
-  "version": "0.3.16-5-beta3",
+  "version": "0.3.16-5-beta4",
   "description": "Data-Mapper ORM for TypeScript, ES7, ES6, ES5. Supports MySQL, PostgreSQL, MariaDB, SQLite, MS SQL Server, Oracle, MongoDB, Spanner databases.",
   "license": "MIT",
   "readmeFilename": "README.md",
@@ -143,7 +143,7 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "@streamyard/spanner": "^5.18.0",
+    "@streamyard/spanner": "^7.3.0-2",
     "@sap/hana-client": "^2.12.25",
     "better-sqlite3": "^7.1.2 || ^8.0.0",
     "hdb-pool": "^0.1.6",
