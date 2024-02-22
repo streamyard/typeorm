@@ -729,7 +729,7 @@ Steps to run this project:
                 packageJson.dependencies["mongodb"] = "^5.2.0"
                 break
             case "spanner":
-                packageJson.dependencies["@streamyard/spanner"] = "^5.18.0"
+                packageJson.dependencies["@streamyard/spanner"] = "^7.3.0-2"
                 break
         }
 
