@@ -15,7 +15,7 @@ export interface SpannerConnectionOptions
 
     /**
      * The driver object
-     * This defaults to require("@streamyard/spanner").
+     * This defaults to require("@google-cloud/spanner").
      */
     readonly driver?: any
 
