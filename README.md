@@ -222,7 +222,7 @@ await timber.remove()
     - for **Google Cloud Spanner**
 
         ```
-        npm install @streamyard/spanner --save
+        npm install @google-cloud/spanner --save
         ```
 
         Provide authentication credentials to your application code
