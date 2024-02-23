@@ -752,7 +752,7 @@ export class SpannerDriver implements Driver {
             console.error(e)
             throw new DriverPackageNotInstalledError(
                 "Spanner",
-                "@streamyard/spanner",
+                "@google-cloud/spanner",
             )
         }
     }

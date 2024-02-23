@@ -40,7 +40,7 @@ export class PlatformTools {
                  * spanner
                  */
                 case "spanner":
-                    return require("@streamyard/spanner")
+                    return require("@google-cloud/spanner")
 
                 /**
                  * mongodb
