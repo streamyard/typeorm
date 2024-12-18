@@ -140,7 +140,7 @@ export class SpannerDriver implements Driver {
         deleteDateNullable: true,
         version: "int64",
         treeLevel: "int64",
-        migrationId: "int64",
+        migrationId: "string",
         migrationName: "string",
         migrationTimestamp: "int64",
         cacheId: "string",
@@ -210,7 +210,7 @@ export class SpannerDriver implements Driver {
      */
     async connect(): Promise<void> {
         this.instance = this.spanner.instance(this.options.instanceId)
-        this.instanceDatabase = this.instance.database(this.options.databaseId)
+        this.instanceDatabase = this.instance.database(this.options.databaseId, this.options.sessionPool ?? {})
     }
 
     /**
