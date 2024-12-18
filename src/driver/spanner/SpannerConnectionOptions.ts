@@ -1,4 +1,5 @@
 import { BaseConnectionOptions } from "../../connection/BaseConnectionOptions"
+import { ReplicationMode } from "../types/ReplicationMode"
 import { SpannerConnectionCredentialsOptions } from "./SpannerConnectionCredentialsOptions"
 import { SpannerSessionPoolOptions } from "./SpannerSessionPoolOptions"
 
@@ -144,6 +145,12 @@ export interface SpannerConnectionOptions
          * ORDER: Select the first node available unconditionally.
          */
         readonly selector?: "RR" | "RANDOM" | "ORDER"
+
+        /**
+         * Default connection pool to use for SELECT queries
+         * @default "slave"
+         */
+        readonly defaultMode?: ReplicationMode
     }
 
     readonly poolSize?: never

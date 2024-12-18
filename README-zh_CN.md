@@ -20,7 +20,7 @@
   <br>
 </div>
 
-TypeORM 是一个 [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) 框架，它可以运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上，可以与 TypeScript 和 JavaScript (ES5,ES6,ES7,ES8)一起使用。 它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的（不管是只有几张表的小型应用还是拥有多数据库的大型企业应用）应用程序。
+TypeORM 是一个 [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) 框架，它可以运行在 NodeJS、Browser、Cordova、PhoneGap、Ionic、React Native、Expo 和 Electron 平台上，可以与 TypeScript 和 JavaScript (ES2021)一起使用。 它的目标是始终支持最新的 JavaScript 特性并提供额外的特性以帮助你开发任何使用数据库的（不管是只有几张表的小型应用还是拥有多数据库的大型企业应用）应用程序。
 
 不同于现有的所有其他 JavaScript ORM 框架，TypeORM 支持 [Data Mapper](./docs/zh_CN/active-record-data-mapper.md#什么是data-mapper模式) 和 [Active Record](./docs/zh_CN/active-record-data-mapper.md#什么是active-record模式) 模式，这意味着你可以以最高效的方式编写高质量的、松耦合的、可扩展的、可维护的应用程序。
 
@@ -1153,7 +1153,6 @@ let photos = await connection
 
 这几个扩展可以简化 TypeORM 的使用，并将其与其他模块集成：
 
-- [TypeORM + GraphQL framework](http://vesper-framework.com)
 - [TypeORM integration](https://github.com/typeorm/typeorm-typedi-extensions) with [TypeDI](https://github.com/pleerock/typedi)
 - [TypeORM integration](https://github.com/typeorm/typeorm-routing-controllers-extensions) with [routing-controllers](https://github.com/pleerock/routing-controllers)
 - 从现有数据库生成模型 - [typeorm-model-generator](https://github.com/Kononnable/typeorm-model-generator)

@@ -20,7 +20,6 @@ export interface SpannerSessionPoolOptions {
     incStep?: number;
     databaseRole?: string | null;
 }
-
 /* Defaults:
     const DEFAULTS: SessionPoolOptions = {
     acquireTimeout: Infinity,
