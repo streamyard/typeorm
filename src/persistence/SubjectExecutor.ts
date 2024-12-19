@@ -174,7 +174,7 @@ export class SubjectExecutor {
 
         // update all special columns in persisted entities, like inserted id or remove ids from the removed entities
         // console.time(".updateSpecialColumnsInPersistedEntities");
-        await this.updateSpecialColumnsInPersistedEntities()
+        this.updateSpecialColumnsInPersistedEntities()
         // console.timeEnd(".updateSpecialColumnsInPersistedEntities");
 
         // finally broadcast "after" events after we finish insert / update / remove operations
@@ -300,6 +300,7 @@ export class SubjectExecutor {
                     result,
                     subject.metadata,
                     subject.entity!,
+                    subject.identifier,
                 ),
             )
         if (this.updateSubjects.length)
@@ -526,7 +527,6 @@ export class SubjectExecutor {
     protected async executeUpdateOperations(): Promise<void> {
         const isSpanner =
             this.queryRunner.connection.driver.options.type === "spanner"
-
         const updateSubject = async (subject: Subject) => {
             if (!subject.identifier)
                 throw new SubjectWithoutIdentifierError(subject)
@@ -1080,6 +1080,9 @@ export class SubjectExecutor {
 
                 // entities does not have virtual columns
                 if (column.isVirtual) return
+
+                // if column is deletedAt
+                if (column.isDeleteDate) return
 
                 // update nullable columns
                 if (column.isNullable) {
