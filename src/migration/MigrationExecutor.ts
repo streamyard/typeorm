@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid"
+
 import { Table } from "../schema-builder/table/Table"
 import { DataSource } from "../data-source/DataSource"
 import { Migration } from "./Migration"
@@ -515,7 +517,9 @@ export class MigrationExecutor {
                                     .migrationId,
                             }),
                             isGenerated: true,
-                            generationStrategy: "increment",
+                            generationStrategy: this.connection.driver.options.type === "spanner"
+                            ? "uuid"
+                            : "increment",
                             isPrimary: true,
                             isNullable: false,
                         },
@@ -664,6 +668,11 @@ export class MigrationExecutor {
         } else {
             values["timestamp"] = migration.timestamp
             values["name"] = migration.name
+        }
+
+        if(this.connection.driver.options.type === "spanner"){
+            // Spanner cannot auto-generate the id, so we need to provide it
+            values["id"] = uuidv4()
         }
         if (this.connection.driver.options.type === "mongodb") {
             const mongoRunner = queryRunner as MongoQueryRunner
