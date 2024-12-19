@@ -210,7 +210,10 @@ export class SpannerDriver implements Driver {
      */
     async connect(): Promise<void> {
         this.instance = this.spanner.instance(this.options.instanceId)
-        this.instanceDatabase = this.instance.database(this.options.databaseId, this.options.sessionPool ?? {})
+        this.instanceDatabase = this.instance.database(
+            this.options.databaseId,
+            this.options.sessionPool ?? {},
+        )
     }
 
     /**

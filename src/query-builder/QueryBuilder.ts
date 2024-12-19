@@ -838,20 +838,6 @@ export abstract class QueryBuilder<Entity extends ObjectLiteral> {
     }
 
     /**
-     * Time travel queries for CockroachDB
-     */
-    protected createTimeTravelQuery(): string {
-        if (
-            this.expressionMap.queryType === "select" &&
-            this.expressionMap.timeTravel
-        ) {
-            return ` AS OF SYSTEM TIME ${this.expressionMap.timeTravel}`
-        }
-
-        return ""
-    }
-
-    /**
      * Creates "WHERE" expression.
      */
     protected createWhereExpression() {

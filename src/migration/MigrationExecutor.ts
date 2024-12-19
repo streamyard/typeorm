@@ -517,9 +517,11 @@ export class MigrationExecutor {
                                     .migrationId,
                             }),
                             isGenerated: true,
-                            generationStrategy: this.connection.driver.options.type === "spanner"
-                            ? "uuid"
-                            : "increment",
+                            generationStrategy:
+                                this.connection.driver.options.type ===
+                                "spanner"
+                                    ? "uuid"
+                                    : "increment",
                             isPrimary: true,
                             isNullable: false,
                         },
@@ -670,7 +672,7 @@ export class MigrationExecutor {
             values["name"] = migration.name
         }
 
-        if(this.connection.driver.options.type === "spanner"){
+        if (this.connection.driver.options.type === "spanner") {
             // Spanner cannot auto-generate the id, so we need to provide it
             values["id"] = uuidv4()
         }
